@@ -1,5 +1,5 @@
 
-class GreenMultirotorClient(object):
+class GreenMultirotorClient(MultirotorClient):
 
 	def __init__(self):
 		pass
