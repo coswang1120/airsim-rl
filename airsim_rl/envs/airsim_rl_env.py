@@ -56,7 +56,7 @@ class AirsimRLEnv(gym.Env):
 	def _take_action(self, action):
 		assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
-		self.mt_client.take_action(action)
+		self.mt_client.take_actiontake_action
 
 
 

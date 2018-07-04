@@ -1,4 +1,6 @@
 
+# ToDo: need to import MultirotorClient
+
 class GreenMultirotorClient(MultirotorClient):
 
 	def __init__(self):
@@ -24,7 +26,7 @@ class GreenMultirotorClient(MultirotorClient):
 	def reset(self):
 		"""
 		Resets the state of the environment and returns an initial observation.
-		
+
 		Returns:
 			observation: the initial observation
 		"""
