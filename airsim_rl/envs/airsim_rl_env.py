@@ -1,12 +1,14 @@
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
+from green_multirotor_client import *
 
 
 import logging
 logger = logging.getLogger(__name__)
 
 VEL_MAX = 10
+YAW_RATE_MAX = 10
 
 # note: maybe we should use gym.GoalEnv instead?
 class AirsimRLEnv(gym.Env):
@@ -20,11 +22,12 @@ class AirsimRLEnv(gym.Env):
 		observation_space: a depth image (30, 100)
 		"""
 		self.observation_space = spaces.Box(low=0, high=255, shape=(30, 100))
+		self.observation_space = spaces.Tuple(spaces.Box(low=0, high=255, shape=(30, 100)))
 
 		"""
 		action_space: (vel_x, vel_y)
 		"""
-		self.action_space = spaces.Tuple(spaces.Box(low=-VEL_MAX, high=VEL_MAX), spaces.Box(low=-VEL_MAX, high=VEL_MAX))
+		self.action_space = spaces.Tuple(spaces.Box(low=-VEL_MAX, high=VEL_MAX), spaces.Box(low=-VEL_MAX, high=VEL_MAX), spaces.Box(low=-VEL_MAX, high=VEL_MAX))
 
 
 	# note: should I underscore the method name? What does it mean?
@@ -43,20 +46,32 @@ class AirsimRLEnv(gym.Env):
             done (boolean): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
         """
-		self._take_action(action)
+		collided = self._take_action(action)
 
 		reward = self.compute_reward()
-		ob = self.mt_client.get_state()
-		#done = 
+		
+
+		if collided == True:
+			done = True
+			reward = -100.0
+		else:
+			done = False
+			reward, distance = self.compute_reward()
+
+		if distance < 3:
+			done = True
+			reward = 100.0
+
+		self.state = self.mt_client.get_state()
+		info = mt_client.get_sensor_info()
 
 
-
-		pass
+		return self.state, reward, done, info
 
 	def _take_action(self, action):
 		assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
-		self.mt_client.take_actiontake_action
+		self.mt_client.take_action(action)
 
 
 
