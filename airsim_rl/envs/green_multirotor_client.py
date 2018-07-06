@@ -9,7 +9,7 @@ class GreenMultirotorClient(MultirotorClient):
 	def __init__(self):
 		pass
 
-	def take_action(self, action):
+	def _take_action(self, action):
 		"""
 		Args:
 			action: (vel_x, vel_y, yaw_rate)
@@ -20,7 +20,7 @@ class GreenMultirotorClient(MultirotorClient):
 		"""
 		pass
 
-	def get_state(self):
+	def _get_state(self):
 		"""
 		Returns:
 			observation: agent's observation of the current environment
@@ -28,7 +28,7 @@ class GreenMultirotorClient(MultirotorClient):
 		"""
 		pass
 
-	def reset(self):
+	def _reset(self):
 		"""
 		Resets the state of the environment and returns an initial observation.
 
