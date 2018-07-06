@@ -9,9 +9,10 @@ class GreenMultirotorClient(MultirotorClient):
 	def take_action(self, action):
 		"""
 		Args:
-			action: 
+			action: (vel_x, vel_y, yaw_rate)
 
 		Returns:
+			collided: True if collision occured
 
 		"""
 		pass
@@ -20,6 +21,7 @@ class GreenMultirotorClient(MultirotorClient):
 		"""
 		Returns:
 			observation: agent's observation of the current environment
+						 [[vel_x, vel_y, vel_z, acc_x, acc_y, acc_z, roll, pitch, yaw], depth_image]
 		"""
 		pass
 
