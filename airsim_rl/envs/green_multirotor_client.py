@@ -43,12 +43,6 @@ class GreenMultirotorClient(MultirotorClient):
 		pass
 
 	def _reset(self):
-		"""
-		Resets the state of the environment and returns an initial observation.
-		
-        Returns: observation (object): the initial observation of the
-            space.
-        """
 		self.armDisarm(False)
 		self.reset()
 		self.enableApiControl(False)
