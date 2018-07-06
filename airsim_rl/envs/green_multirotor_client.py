@@ -55,6 +55,7 @@ class GreenMultirotorClient(MultirotorClient):
 		self.armDisarm(True)
 		self.enableApiControl(True)
 		self._take_off()
+		return self._get_state()
 
 	def get_sensor_info(self):
 		"""
