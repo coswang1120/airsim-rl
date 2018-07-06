@@ -48,8 +48,7 @@ class GreenMultirotorClient(MultirotorClient):
 		self.enableApiControl(False)
 		self.armDisarm(True)
 		self.enableApiControl(True)
-		self.moveToPositionAsync(0,0,0)
-		self.hoverAsync().join()
+		self._take_off()
 
 	def get_sensor_info(self):
 		"""
