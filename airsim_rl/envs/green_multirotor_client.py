@@ -1,8 +1,20 @@
 
 # ToDo: need to import MultirotorClient
 
-NUM_SENSOR_STATE = 9
-VEL_X, VEL_Y, VEL_Z, ACC_X, ACC_Y, ACC_Z, ROLL, PITCH, YAW = range(NUM_SENSOR_STATE)
+
+NUM_SENSOR_STATES = 9
+VEL_X, VEL_Y, VEL_Z, ACC_X, ACC_Y, ACC_Z, ROLL, PITCH, YAW = range(NUM_SENSOR_STATES)
+STATE_STRINGS = {
+	VEL_X: "Vel_X",
+	VEL_Y: "Vel_Y",
+	VEL_Z: "Vel_Z",
+	ACC_X: "Acc_X",
+	ACC_Y: "Acc_Y",
+	ACC_Z: "Acc_Z",
+	ROLL: "Roll",
+	PITCH: "Pitch",
+	YAW: "Yaw"
+}
 
 class GreenMultirotorClient(MultirotorClient):
 
@@ -26,8 +38,7 @@ class GreenMultirotorClient(MultirotorClient):
 	def _get_state(self):
 		"""
 		Returns:
-			observation: agent's observation of the current environment
-						 [[vel_x, vel_y, vel_z, acc_x, acc_y, acc_z, roll, pitch, yaw], depth_image]
+			observation: agent's observation of the current environment (depth image)
 		"""
 		pass
 
@@ -39,3 +50,10 @@ class GreenMultirotorClient(MultirotorClient):
 		self.enableApiControl(True)
 		self.moveToPositionAsync(0,0,0)
 		self.hoverAsync().join()
+
+	def get_sensor_info(self):
+		"""
+		Returns:
+			sensor info: dictionary which contains sensor information (refer to STATE_STRING for key names)
+		"""
+		pass
