@@ -32,6 +32,9 @@ class GreenMultirotorClient(MultirotorClient):
         self.hoverAsync().join()
 
 	def _take_action(self, action):
+		"""
+		Returns: collision tre/false
+		"""
 		vel_x = action[0]
 		vel_y = action[1]
 		yaw = action[2]
