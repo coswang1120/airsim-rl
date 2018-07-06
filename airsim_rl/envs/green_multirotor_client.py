@@ -1,6 +1,9 @@
 
 # ToDo: need to import MultirotorClient
 
+NUM_SENSOR_STATE = 9
+VEL_X, VEL_Y, VEL_Z, ACC_X, ACC_Y, ACC_Z, ROLL, PITCH, YAW = range(NUM_SENSOR_STATE)
+
 class GreenMultirotorClient(MultirotorClient):
 
 	def __init__(self):
