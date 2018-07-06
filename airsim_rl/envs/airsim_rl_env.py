@@ -15,8 +15,12 @@ class AirsimRLEnv(gym.Env):
 
 	def __init__(self):
 
-		mt_client = GreenMultirotorClient()
+		self.mt_client = GreenMultirotorClient()
 
+		self.goal_pos = (0, 0)
+		self.cur_pos = (0, 0)
+		self.reward_sum = 0
+		self.collided = False
 
 		"""
 		observation_space: a depth image (30, 100)
@@ -31,7 +35,7 @@ class AirsimRLEnv(gym.Env):
 
 
 	# note: should I underscore the method name? What does it mean?
-	def step(self, action):
+	def _step(self, action):
 		"""
 		 Run one timestep of the environment's dynamics. When end of
         episode is reached, you are responsible for calling `reset()`
@@ -46,21 +50,16 @@ class AirsimRLEnv(gym.Env):
             done (boolean): whether the episode has ended, in which case further step() calls will return undefined results
             info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
         """
-		collided = self._take_action(action)
+		self.collided = self._take_action(action)
+
+		self.cur_pos = self.mt_client.get_position()
 
 		reward = self.compute_reward()
-		
 
-		if collided == True:
-			done = True
-			reward = -100.0
-		else:
-			done = False
-			reward, distance = self.compute_reward()
+		reward_sum = reward_sum + reward
 
-		if distance < 3:
+		if reward_sum < -100 or self.collided:
 			done = True
-			reward = 100.0
 
 		self.state = self.mt_client.get_state()
 		info = mt_client.get_sensor_info()
@@ -75,35 +74,34 @@ class AirsimRLEnv(gym.Env):
 
 
 
-	def compute_reward(self, achieved_goal, desired_goal, info):
-		"""
-		 Compute the step reward. This externalizes the reward function and makes
-        it dependent on an a desired goal and the one that was achieved. If you wish to include
-        additional rewards that are independent of the goal, you can include the necessary values
-        to derive it in info and compute it accordingly.
+	def compute_reward():
 
-        Args:
-            achieved_goal (object): the goal that was achieved during execution
-            desired_goal (object): the desired goal that we asked the agent to attempt to achieve
-            info (dict): an info dictionary with additional information
-            
-        Returns:
-            float: The reward that corresponds to the provided achieved goal w.r.t. to the desired
-            goal. Note that the following should always hold true:
-                ob, reward, done, info = env.step()
+        r = -1
 
-                assert reward == env.compute_reward(ob['achieved_goal'], ob['goal'], info)
-        """
-		pass
+		if self.collided == True:
+			r = r + -100.0
+		elif self.get_distance_from_goal() < 3:
+			r = r + 100.0
 
-	def reset(self):
+		return r
+
+	def _reset(self):
 		"""Resets the state of the environment and returns an initial observation.
         Returns: observation (object): the initial observation of the
             space.
         """
-		ob = self.mt_client.reset()
+		self.mt_client.reset()
 
-		return ob
+		reward_sum = 0
+
+		self.state = self.mt_client.get_state()
+		self.collided = False
+		self.cur_pos = (0, 0)
+
+		return self.state
 
 	def render(self, mode, close):
 		pass
+
+	def get_distance_from_goal():
+		return np.sqrt(np.power((self.goal_pos[0]-self.cur_pos[0]),2) + np.power((self.goal_pos[1]-self.cur_pos[1]),2))
