@@ -2,8 +2,8 @@
 # ToDo: need to import MultirotorClient
 
 
-NUM_SENSOR_STATEs = 9
-VEL_X, VEL_Y, VEL_Z, ACC_X, ACC_Y, ACC_Z, ROLL, PITCH, YAW = range(NUM_SENSOR_STATE)
+NUM_SENSOR_STATES = 9
+VEL_X, VEL_Y, VEL_Z, ACC_X, ACC_Y, ACC_Z, ROLL, PITCH, YAW = range(NUM_SENSOR_STATES)
 STATE_STRINGS = {
 	VEL_X: "Vel_X",
 	VEL_Y: "Vel_Y",
