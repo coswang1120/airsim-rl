@@ -33,13 +33,14 @@ class GreenMultirotorClient(MultirotorClient):
 
 	def _take_action(self, action):
 		"""
-		Returns: collision tre/false
+		Returns: collision true/false
 		"""
 		vel_x = action[0]
 		vel_y = action[1]
 		yaw = action[2]
 		self.moveByVelocityAsync((vel_x), (vel_y), 0, 0.01,drivetrain = airsim.DrivetrainType.MaxDegreeOfFreedom, yaw_mode=airsim.YawMode(True, yaw)).join()
 		self.hoverAsync().join()
+		return self.simGetCollisionInfo().has_collided
 
 	def _get_state(self):
 		"""
@@ -63,3 +64,10 @@ class GreenMultirotorClient(MultirotorClient):
 			sensor info: dictionary which contains sensor information (refer to STATE_STRING for key names)
 		"""
 		pass
+
+	def _get_position(self):
+		state = self.getMultirotorState()
+		pos_x = state.kinematics_estimated.position.x_val
+		pos_y = state.kinematics_estimated.position.y_val
+		position = (pos_x, pos_y)
+		return position
