@@ -32,6 +32,9 @@ class GreenMultirotorClient(MultirotorClient):
         self.hoverAsync().join()
 
 	def _take_action(self, action):
+		vel_x = action[0]
+		vel_y = action[1]
+		yaw = action[2]
 		self.moveByVelocityAsync((vel_x), (vel_y), 0, 0.01,drivetrain = airsim.DrivetrainType.MaxDegreeOfFreedom, yaw_mode=airsim.YawMode(True, yaw)).join()
 		self.hoverAsync().join()
 
@@ -49,6 +52,7 @@ class GreenMultirotorClient(MultirotorClient):
 		self.armDisarm(True)
 		self.enableApiControl(True)
 		self._take_off()
+		return self._get_state()
 
 	def get_sensor_info(self):
 		"""
