@@ -1,6 +1,6 @@
 import setup_path 
 import airsim
-from airsim import MultirotorClient
+from airsim import *
 import sys
 
 import numpy as np
@@ -60,12 +60,53 @@ class GreenMultirotorClient(MultirotorClient):
 		self.hoverAsync().join()
 		return self.simGetCollisionInfo().has_collided
 
+	def _get_collision_info(self)
+		return self.simGetCollisionInfo().has_collided
+
 	def _get_state(self):
 		"""
 		Returns:
 			observation: agent's observation of the current environment (depth image)
 		"""
-		pass
+		responses = self.simGetImages([ImageRequest(0, ImageType.DepthPerspective, True, False)])
+        img1d = np.array(responses[0].image_data_float, dtype=np.float)
+        img1d = 255/np.maximum(np.ones(img1d.size), img1d)
+        img2d = np.reshape(img1d, (responses[0].height, responses[0].width))
+        
+       
+
+
+        image = np.invert(np.array(Image.fromarray(img2d.astype(np.uint8), mode='L')))
+          
+        factor = 10
+        maxIntensity = 255.0 # depends on dtype of image data
+        
+        # Decrease intensity such that dark pixels become much darker, bright pixels become slightly dark 
+        newImage1 = (maxIntensity)*(image/maxIntensity)**factor
+        newImage1 = array(newImage1,dtype=uint8)
+        
+        
+        small = cv2.resize(newImage1, (0,0), fx=0.39, fy=0.38)
+        cut = small[20:40,:]
+        img = Image.fromarray(cut,'L')
+        img.show()
+        print(image.shape, cut.shape)
+        
+        """info_section = np.zeros((10,cut.shape[1]),dtype=np.uint8) + 255
+        info_section[9,:] = 0
+        
+        line = np.int((((track - -180) * (100 - 0)) / (180 - -180)) + 0)
+        
+        if line != (0 or 100):
+            info_section[:,line-1:line+2]  = 0
+        elif line == 0:
+            info_section[:,0:3]  = 0
+        elif line == 100:
+            info_section[:,info_section.shape[1]-3:info_section.shape[1]]  = 0
+            
+        total = np.concatenate((info_section, cut), axis=0)"""
+        
+        return cut
 
 	def _reset(self):
 		self.armDisarm(False)
