@@ -29,9 +29,8 @@ parsing arguments!
 """
 parser = argparse.ArgumentParser()
 parser.add_argument('--env-name', type=str, default='airsim-rl-v0')
-
-
-env = gym.make(args.env)
+parser.add_argument('--mode', choices=['train', 'test'], default='train')
+parser.add_argument('--weights', type=str, default=None)
 
 args = parser.parse_args()
 
@@ -43,7 +42,8 @@ env.seed(now)
 
 
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
-INPUT_SHAPE = (30, 100)
+# Note: what about using env.observation_space.n?
+INPUT_SHAPE = (144, 256)
 WINDOW_LENGTH = 1
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
 input_shape = (WINDOW_LENGTH,) + INPUT_SHAPE
