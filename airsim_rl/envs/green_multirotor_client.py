@@ -1,4 +1,22 @@
+import setup_path 
+import airsim
+from airsim import MultirotorClient
+import sys
 
+import numpy as np
+import os
+import tempfile
+import pprint
+
+
+import time
+import math
+import cv2
+from pylab import array, arange, uint8 
+from PIL import Image
+import eventlet
+from eventlet import Timeout
+import multiprocessing as mp
 # ToDo: need to import MultirotorClient
 
 
@@ -58,12 +76,15 @@ class GreenMultirotorClient(MultirotorClient):
 		self._take_off()
 		return self._get_state()
 
-	def get_sensor_info(self):
+	def _get_sensor_info(self):
 		"""
 		Returns:
 			sensor info: dictionary which contains sensor information (refer to STATE_STRING for key names)
 		"""
-		pass
+		state = {
+			STATE_STRINGS[VEL_X]: 
+		}
+		return state
 
 	def _get_position(self):
 		state = self.getMultirotorState()
