@@ -122,10 +122,21 @@ class GreenMultirotorClient(MultirotorClient):
 		Returns:
 			sensor info: dictionary which contains sensor information (refer to STATE_STRING for key names)
 		"""
-		state = {
-			STATE_STRINGS[VEL_X]: 
+		state = self.simGetGroundTruthKinematics()
+        pitch, roll, yaw  = airsim.to_eularian_angles(self.simGetVehiclePose().orientation)
+        #yaw = math.degrees(yaw) 
+        ret = {
+			STATE_STRINGS[VEL_X]: state['linear_velocity']['x_val'],
+			STATE_STRINGS[VEL_Y]: state['linear_velocity']['y_val'],
+			STATE_STRINGS[VEL_Z]: state['linear_velocity']['z_val'],
+			STATE_STRINGS[ACC_X]: state['linear_acceleration']['x_val'],
+			STATE_STRINGS[ACC_Y]: state['linear_acceleration']['y_val'],
+			STATE_STRINGS[ACC_Z]: state['linear_acceleration']['z_val'],
+			STATE_STRINGS[ROLL]: roll,
+			STATE_STRINGS[PITCH]: pitch,
+			STATE_STRINGS[YAW]: yaw
 		}
-		return state
+        return ret
 
 	def _get_position(self):
 		state = self.getMultirotorState()
