@@ -1,1 +1,1 @@
-from airsim_rl.envs.airsim_rl import AirsimRLEnv
+from airsim_rl.envs.airsim_rl_env import AirsimRLEnv
