@@ -1,7 +1,7 @@
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
-from green_multirotor_client import *
+from airsim_rl.envs.green_multirotor_client import *
 
 
 import logging
@@ -26,7 +26,6 @@ class AirsimRLEnv(gym.Env):
 		observation_space: a depth image (30, 100)
 		"""
 		self.observation_space = spaces.Box(low=0, high=255, shape=(30, 100))
-		self.observation_space = spaces.Tuple(spaces.Box(low=0, high=255, shape=(30, 100)))
 
 		"""
 		action_space: (vel_x, vel_y)
@@ -38,21 +37,21 @@ class AirsimRLEnv(gym.Env):
 	def _step(self, action):
 		"""
 		 Run one timestep of the environment's dynamics. When end of
-        episode is reached, you are responsible for calling `reset()`
-        to reset this environment's state.
-        Accepts an action and returns a tuple (observation, reward, done, info).
+		episode is reached, you are responsible for calling `reset()`
+		to reset this environment's state.
+		Accepts an action and returns a tuple (observation, reward, done, info).
 
-        Args:
-            action (object): an action provided by the environment
-        Returns:
-            observation (object): agent's observation of the current environment
-            reward (float) : amount of reward returned after previous action
-            done (boolean): whether the episode has ended, in which case further step() calls will return undefined results
-            info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
-        """
+		Args:
+			action (object): an action provided by the environment
+		Returns:
+			observation (object): agent's observation of the current environment
+			reward (float) : amount of reward returned after previous action
+			done (boolean): whether the episode has ended, in which case further step() calls will return undefined results
+			info (dict): contains auxiliary diagnostic information (helpful for debugging, and sometimes learning)
+		"""
 		self.collided = self._take_action(action)
 
-		self.cur_pos = self.mt_client.get_position()
+		self.cur_pos = self.mt_client._get_position()
 
 		reward = self.compute_reward()
 
@@ -61,8 +60,8 @@ class AirsimRLEnv(gym.Env):
 		if reward_sum < -100 or self.collided:
 			done = True
 
-		self.state = self.mt_client.get_state()
-		info = mt_client.get_sensor_info()
+		self.state = self.mt_client._get_state()
+		info = mt_client._get_sensor_info()
 
 
 		return self.state, reward, done, info
@@ -70,13 +69,13 @@ class AirsimRLEnv(gym.Env):
 	def _take_action(self, action):
 		assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
-		self.mt_client.take_action(action)
+		self.mt_client._take_action(action)
 
 
 
 	def compute_reward():
 
-        r = -1
+		r = -1
 
 		if self.collided == True:
 			r = r + -100.0
@@ -87,14 +86,14 @@ class AirsimRLEnv(gym.Env):
 
 	def _reset(self):
 		"""Resets the state of the environment and returns an initial observation.
-        Returns: observation (object): the initial observation of the
-            space.
-        """
-		self.mt_client.reset()
+		Returns: observation (object): the initial observation of the
+			space.
+		"""
+		self.mt_client._reset()
 
 		reward_sum = 0
 
-		self.state = self.mt_client.get_state()
+		self.state = self.mt_client._get_state()
 		self.collided = False
 		self.cur_pos = (0, 0)
 
