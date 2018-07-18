@@ -53,15 +53,20 @@ class GreenMultirotorClient(MultirotorClient):
 		"""
 		Args:
 			action: (vx, vy, yaw_rate)
-			mode: "NED" or "BODY"
+			mode: "FO" or "MD"
 		Returns: collision true/false
 
 		"""
 		vel_x = action[0]
 		vel_y = action[1]
-		yaw = action[2]
-		self.moveByVelocityAsync((vel_x), (vel_y), 0, 0.01,drivetrain = airsim.DrivetrainType.MaxDegreeOfFreedom, yaw_mode=airsim.YawMode(True, yaw)).join()
-		self.hoverAsync().join()
+		cur_pitch, cur_roll, cur_yaw  = airsim.to_eularian_angles(self.simGetVehiclePose().orientation)
+		if mode == "FO":
+			self.moveByVelocityAsync((vel_x)*math.cos(cur_yaw)-(vel_y)*math.sin(cur_yaw), (vel_x)*math.sin(cur_yaw)+(vel_y)*math.cos(cur_yaw), 0, 0.01,drivetrain = airsim.DrivetrainType.ForwardOnly, yaw_mode=airsim.YawMode(False)).join()
+			self.hoverAsync().join()
+		else:
+			"""cur_yaw  should be replaced """
+			self.moveByVelocityAsync((vel_x)*math.cos(cur_yaw)-(vel_y)*math.sin(cur_yaw), (vel_x)*math.sin(cur_yaw)+(vel_y)*math.cos(cur_yaw), 0, 0.01,drivetrain = airsim.DrivetrainType.MaxDegreeOfFreedom, yaw_mode=airsim.YawMode(True, cur_yaw)).join()
+			self.hoverAsync().join()
 		return self.simGetCollisionInfo().has_collided
 
 	def _get_collision_info(self):
