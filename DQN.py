@@ -36,14 +36,14 @@ args = parser.parse_args()
 
 
 env = gym.make(args.env_name)
-now = datetime.now()
+now = int(datetime.now().timestamp())
 np.random.seed(now)
 env.seed(now)
-
+nb_actions = env.action_space.n
 
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
 # Note: what about using env.observation_space.n?
-INPUT_SHAPE = (144, 256)
+INPUT_SHAPE = (20, 100)
 WINDOW_LENGTH = 1
 # Next, we build our model. We use the same model that was described by Mnih et al. (2015).
 input_shape = (WINDOW_LENGTH,) + INPUT_SHAPE
@@ -91,9 +91,10 @@ if train:
     
     
     log_filename = 'dqn_{}_log.json'.format(args.env_name)
-    callbacks = [FileLogger(log_filename, interval=100)]
+    # callbacks = [FileLogger(log_filename, interval=100)]
     
-    dqn.fit(env, callbacks=callbacks, nb_steps=251000, visualize=False, verbose=2, log_interval=100)
+    # dqn.fit(env, callbacks=callbacks, nb_steps=251000, visualize=False, verbose=2, log_interval=100)
+    dqn.fit(env, nb_steps=251000, visualize=False, verbose=2)
     
     
     # After training is done, we save the final weights.

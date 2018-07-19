@@ -98,8 +98,8 @@ class GreenMultirotorClient(MultirotorClient):
 		small = cv2.resize(newImage1, (0,0), fx=0.39, fy=0.38)
 		cut = small[20:40,:]
 		img = Image.fromarray(cut,'L')
-		img.show()
-		print(image.shape, cut.shape)
+		# img.show()
+		# print(image.shape, cut.shape)
 		
 		"""info_section = np.zeros((10,cut.shape[1]),dtype=np.uint8) + 255
 		info_section[9,:] = 0
