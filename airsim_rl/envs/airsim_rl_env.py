@@ -6,11 +6,15 @@ from airsim_rl.envs.green_multirotor_client import *
 from math import radians, sin, cos
 import logging
 import numpy as np
+import time
 
 logger = logging.getLogger(__name__)
 
 VEL_MAX = 10.0
 YAW_RATE_MAX = 10.0
+
+VELOCITY = 3
+DURATION = 0.7
 
 # note: maybe we should use gym.GoalEnv instead?
 class AirsimRLEnv(gym.Env):
@@ -29,7 +33,7 @@ class AirsimRLEnv(gym.Env):
 		"""
 		observation_space: a depth image (30, 100)
 		"""
-		self.observation_space = spaces.Box(low=0, high=255, shape=(30, 100))
+		self.observation_space = spaces.Box(low=0, high=255, shape=(20, 100))
 
 		"""
 		action_space: (vel_x, vel_y)
@@ -72,32 +76,32 @@ class AirsimRLEnv(gym.Env):
 
 
 		print(self.reward_sum)
+		
 
 		return self.state, reward, done, info
 
 	def _take_action(self, action):
 		assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
 
-		self.mt_client._take_action(ACTION_LOOKUP[action], "FO")
+		return self.mt_client._take_action([VELOCITY*x for x in ACTION_LOOKUP[action]], DURATION, "FO")
 
 
 
 	def compute_reward(self, cur_pos):
 		distance_now = np.sqrt(np.power((self.goal_pos[0]-cur_pos[0]),2) + np.power((self.goal_pos[1]-cur_pos[1]),2))
-        
-        
-
-		r = -1
+		
+		r = -2
 
 		if self.collided == True:
 			r = r + -100.0
 		elif self.get_distance_from_goal() < 3:
 			r = r + 100.0
 
-		r = r + self.distance_before - distance_now
+		# print("advanced: ", self.distance_before - distance_now)
+		r = r + (self.distance_before - distance_now) * 10
 
 		self.distance_before = distance_now
-		
+
 		return r
 
 	def _reset(self):
@@ -112,6 +116,8 @@ class AirsimRLEnv(gym.Env):
 		self.state = self.mt_client._get_state()
 		self.collided = False
 		self.cur_pos = (0, 0)
+
+		self.distance_before = 113.227
 
 		return self.state
 

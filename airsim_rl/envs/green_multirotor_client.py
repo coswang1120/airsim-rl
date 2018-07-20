@@ -49,7 +49,7 @@ class GreenMultirotorClient(MultirotorClient):
 		self.moveToPositionAsync(0,0,-1.3,2).join()
 		self.hoverAsync().join()
 
-	def _take_action(self, action, mode):
+	def _take_action(self, action, duration, mode):
 		"""
 		Args:
 			action: (vx, vy, yaw_rate)
@@ -59,15 +59,24 @@ class GreenMultirotorClient(MultirotorClient):
 		"""
 		vel_x = action[0]
 		vel_y = action[1]
+
 		cur_pitch, cur_roll, cur_yaw  = airsim.to_eularian_angles(self.simGetVehiclePose().orientation)
 		if mode == "FO":
 			self.moveByVelocityAsync((vel_x)*math.cos(cur_yaw)-(vel_y)*math.sin(cur_yaw), (vel_x)*math.sin(cur_yaw)+(vel_y)*math.cos(cur_yaw), 0, 0.01,drivetrain = airsim.DrivetrainType.ForwardOnly, yaw_mode=airsim.YawMode(False)).join()
 			self.hoverAsync().join()
+
 		else:
 			"""cur_yaw  should be replaced """
 			self.moveByVelocityAsync((vel_x)*math.cos(cur_yaw)-(vel_y)*math.sin(cur_yaw), (vel_x)*math.sin(cur_yaw)+(vel_y)*math.cos(cur_yaw), 0, 0.01,drivetrain = airsim.DrivetrainType.MaxDegreeOfFreedom, yaw_mode=airsim.YawMode(True, cur_yaw)).join()
 			self.hoverAsync().join()
-		return self.simGetCollisionInfo().has_collided
+
+		start = time.time()
+
+		while time.time() - start < duration:
+			if self.simGetCollisionInfo().has_collided:
+				print("collision occured!")
+				return True
+
 
 	def _get_collision_info(self):
 		return self.simGetCollisionInfo().has_collided

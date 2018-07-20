@@ -74,34 +74,38 @@ memory = SequentialMemory(limit=100000, window_length=WINDOW_LENGTH)            
 # (low eps). We also set a dedicated eps value that is used during testing. Note that we set it to 0.05c
 # so that the agent still performs some random actions. This ensures that the agent cannot get stuck.
 policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., value_min=.1, value_test=0.0,
-                              nb_steps=100000)
+							  nb_steps=100000)
 
 dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=3000, 
-               enable_double_dqn=True, 
-               enable_dueling_network=True, dueling_type='avg', 
-               target_model_update=1e-2, policy=policy, gamma=.99)
+			   enable_double_dqn=True, 
+			   enable_dueling_network=True, dueling_type='avg', 
+			   target_model_update=1e-2, policy=policy, gamma=.99)
 
 dqn.compile(Adam(lr=0.00025), metrics=['mae'])
 
 
 if train:
-    # Okay, now it's time to learn something! We visualize the training here for show, but this
-    # slows down training quite a lot. You can always safely abort the training prematurely using
-    # Ctrl + C.
-    
-    
-    log_filename = 'dqn_{}_log.json'.format(args.env_name)
-    # callbacks = [FileLogger(log_filename, interval=100)]
-    
-    # dqn.fit(env, callbacks=callbacks, nb_steps=251000, visualize=False, verbose=2, log_interval=100)
-    dqn.fit(env, nb_steps=251000, visualize=False, verbose=2)
-    
-    
-    # After training is done, we save the final weights.
-    dqn.save_weights('dqn_{}_weights.h5f'.format(args.env_name), overwrite=True)
+	# Okay, now it's time to learn something! We visualize the training here for show, but this
+	# slows down training quite a lot. You can always safely abort the training prematurely using
+	# Ctrl + C.
+	
+	
+	log_filename = 'dqn_{}_log.json'.format(args.env_name)
+	# callbacks = [FileLogger(log_filename, interval=100)]
+	
+	# dqn.fit(env, callbacks=callbacks, nb_steps=251000, visualize=False, verbose=2, log_interval=100)
+	dqn.fit(env, nb_steps=50000, visualize=False, verbose=2)
+	
+	
+	# After training is done, we save the final weights.
+	dqn.save_weights('dqn_{}_weights.h5f'.format(args.env_name), overwrite=True)
 
 
 else:
-
-    dqn.load_weights('dqn_{}_weights.h5f'.format(args.env_name))
-    dqn.test(env, nb_episodes=10, visualize=False)
+	if args.weights:
+		dqn.load_weights(args.weights)
+	else:
+		dqn.load_weights('dqn_{}_weights.h5f'.format(args.env_name))
+	print("test start!")
+	
+	dqn.test(env, nb_episodes=10, visualize=False)
